@@ -33,3 +33,6 @@ server/dist/
 *.njsproj
 *.sln
 *.sw?
+
+# Service account key
+server/config/serviceAccountKey.json
