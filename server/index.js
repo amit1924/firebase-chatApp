@@ -106,7 +106,12 @@ import admin from "firebase-admin"; // Make sure to import Firebase Admin
 const app = express();
 dotenv.config();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://universal-chat-app.vercel.app"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -127,7 +132,7 @@ const server = app.listen(PORT, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Update this with your client URL
+    origin: ["http://localhost:5173", "https://universal-chat-app.vercel.app"],
     credentials: true,
   },
 });
