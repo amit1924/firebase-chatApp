@@ -3,21 +3,20 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB1h5H3cScJyB4IO8791W4feJVt4xhjt7k",
-  authDomain: "chat-app-e1539.firebaseapp.com",
-  databaseURL:
-    "https://chat-app-e1539-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "chat-app-e1539",
-  storageBucket: "chat-app-e1539.appspot.com",
-  messagingSenderId: "427475159629",
-  appId: "1:427475159629:web:9bce45ae730c8a09ea6a04",
-  measurementId: "G-35ESTKWTR0",
+  apiKey: import.meta.env.VITE_REACT_APP_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env
+    .VITE_REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_REACT_APP_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 console.log("Api Key", firebaseConfig.apiKey);
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 
 export default auth;
