@@ -1,0 +1,126 @@
+Let's break down the code you've provided with a hypothetical example to clarify how the onlineUsers map and the getKey utility function work together in a chat application context.
+
+Global Variable: onlineUsers
+
+global.onlineUsers = new Map();
+Purpose: This line creates a new Map called onlineUsers that will be used to store user IDs and their corresponding socket IDs. The Map allows for efficient lookups, additions, and deletions of entries.
+
+Example Scenario
+Imagine a chat application where users can log in and start chatting with each other. Each user is identified by a unique user ID.
+
+User Connections:
+
+When a user connects to the chat application, they are assigned a socket ID by the server. Let's say we have three users:
+user1 connects and gets a socket ID of socket_abc123.
+user2 connects and gets a socket ID of socket_def456.
+user3 connects and gets a socket ID of socket_xyz789.
+Adding Users to the Map:
+
+When each user connects, their user ID and socket ID are added to the onlineUsers map:
+
+onlineUsers.set("user1", "socket_abc123");
+onlineUsers.set("user2", "socket_def456");
+onlineUsers.set("user3", "socket_xyz789");
+After these operations, the onlineUsers map would look like this:
+
+makefile
+
+onlineUsers = {
+  "user1" => "socket_abc123",
+  "user2" => "socket_def456",
+  "user3" => "socket_xyz789"
+}
+Utility Function: getKey
+
+const getKey = (map, val) => {
+  for (let [key, value] of map.entries()) {
+    if (value === val) return key;
+  }
+};
+Purpose: This function takes a Map and a value (in this case, a socket ID) as parameters. It iterates through the entries of the map and returns the key (user ID) that corresponds to the provided value (socket ID).
+
+Example Scenario with getKey
+Suppose user1 disconnects from the chat application, and you want to remove them from the onlineUsers map. You only have the socket ID (socket_abc123), and you need to find the corresponding user ID to remove.
+
+Finding the User ID:
+
+You call the getKey function:
+
+const userIdToRemove = getKey(onlineUsers, "socket_abc123");
+The function iterates through the onlineUsers map:
+It checks the first entry: key = "user1", value = "socket_abc123"; since they match, it returns user1.
+The iteration stops here since it found the match.
+Removing the User:
+
+Now that you have the user ID (user1), you can remove them from the onlineUsers map:
+
+onlineUsers.delete(userIdToRemove); // This removes "user1" from the map
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+User Connection
+Adding a User:
+
+
+socket.on("addUser", (userId) => {
+  onlineUsers.set(userId, socket.id);
+  socket.emit("getUsers", Array.from(onlineUsers));
+});
+Example: When a user with ID user123 connects to the chat, they emit an event called addUser with their user ID:
+
+
+socket.emit("addUser", "user123");
+The server receives this event and maps user123 to the socket ID of the connecting socket. For instance:
+bash
+
+onlineUsers.set("user123", "socketID_abc123");
+The server then emits the updated list of online users back to the connected user.
+Sending Messages
+Sending a Message:
+
+
+socket.on("sendMessage", ({ senderId, receiverId, message }) => {
+  const sendUserSocket = onlineUsers.get(receiverId);
+  if (sendUserSocket) {
+    socket.to(sendUserSocket).emit("getMessage", {
+      senderId,
+      message,
+    });
+  }
+});
+Example: Suppose user123 wants to send a message to user456. The client emits the sendMessage event:
+
+
+socket.emit("sendMessage", {
+  senderId: "user123",
+  receiverId: "user456",
+  message: "Hello, how are you?",
+});
+The server checks if user456 is online by looking up their socket ID in the onlineUsers map. If user456 is online:
+csharp
+
+sendUserSocket = onlineUsers.get("user456"); // e.g., "socketID_def456"
+The server then emits the message to user456's socket:
+
+
+socket.to("socketID_def456").emit("getMessage", {
+  senderId: "user123",
+  message: "Hello, how are you?",
+});
+User Disconnection
+Handling User Disconnection:
+
+
+socket.on("disconnect", () => {
+  onlineUsers.delete(getKey(onlineUsers, socket.id));
+  socket.emit("getUsers", Array.from(onlineUsers));
+});
+Example: If user123 disconnects from the chat (e.g., closes the browser), the server handles the disconnect event:
+
+
+socket.on("disconnect", () => { ... });
+The server calls getKey(onlineUsers, socket.id) to find the user ID associated with the disconnected socket. If socket.id matches socketID_abc123, it retrieves user123 and removes them from the onlineUsers map:
+go
+
+onlineUsers.delete("user123");
+Finally, the server emits the updated list of online users, excluding the disconnected user.
